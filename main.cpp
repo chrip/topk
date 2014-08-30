@@ -1,3 +1,5 @@
+// g++ -std=c++11 main.cpp -o demo -lm -pthread
+
 #include <iostream>
 #include <queue>
 #include <vector>
