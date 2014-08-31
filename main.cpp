@@ -9,13 +9,18 @@ class IntFloatComparison;
 
 typedef std::pair<int,float> intFloat;
 typedef std::priority_queue<intFloat, std::vector<intFloat>, IntFloatComparison> intFloatQueue;
-
+typedef std::vector<float>* vecPtr;
+typedef std::vector<vecPtr>* vecVecPtr;
+typedef std::vector<vecVecPtr>* vecVecVecPtr;
 static const int k = 3;
 static const int vectorSpaceRows = 8;
 static const int vectorSpaceCols = 6;
 static const int compressionRows = 1000;
 static const int compressionCols = 1000;
 static const int compressionLevels = 2;
+
+static vecVecVecPtr vectorSpacePyramide;
+
 class IntFloatComparison
 {
 public:
@@ -33,41 +38,32 @@ static float innerProduct(const float* lhs, const float* rhs) {
     return res;
 };
 
-
-static float compressMatrix(const float** matrix, int startRow, int startCol) {
+static float maxInBlock(const vecVecPtr matrix, int startRow, int startCol) {
   int endRow = startRow + compressionRows;
   int endCol = startCol + compressionCols;
-  float norm = 0;
+  float m = 0;
   for(int c = startCol; c < endCol; c++){
     for(int r = startRow; r < endRow; r++){
-        compressedMatrix[c][r] = compressBlock(compressedMatrix[c][r], c*compressionCols, r*compressionRows);
+        m = std::max(m, matrix->at(c)->at(r));
     }
   }
+  return m;
 };
 
-static float** compressMatrix(const float** matrix, int matrixRows, int matrixCols, int level) {
+const vecVecPtr compressMatrix(const vecVecPtr matrix, int matrixRows, int matrixCols, int level) {
   if (level == 0) {
     return matrix;
   }
-  int newCols = matrixCols/compressionCols;
-  int newRows = matrixRows/compressionRows;
+  const int newCols = matrixCols/compressionCols;
+  const int newRows = matrixRows/compressionRows;
 
-  auto compressedMatrix = new float[newCols][newRows]();
+  vecVecPtr compressedMatrix = new std::vector<std::vector<float>*>();
   for(int c = 0; c < newCols; c++){
     for(int r = 0; r < newRows; r++){
-        compressedMatrix[c][r] = compressBlock(compressedMatrix[c][r], c*compressionCols, r*compressionRows);
+        compressedMatrix->at(c)->at(r) = maxInBlock(matrix, c*compressionCols, r*compressionRows);
     }
   }
-
-for i = 1 to height of D0 do
-for j = 1 to width of D0 do
-Let C be the submatrix in D associated with D0
-i,j
-D0
-i,j = Lc
-q,∞(C)
-// Recursively Compress D0
-return [D, Compress(D’, lvls -1, q, r, s)]
+  return compressedMatrix;
 }
 
 int main ()
@@ -97,6 +93,10 @@ int main ()
   for(int r = 0; r < vectorSpaceRows; r++) {
     query[r] = r;
     std::cout << query[r] << std::endl;
+  }
+  
+  for(int level = 0; level < compressionLevels; level++){
+      
   }
   
   for(int c = 0; c < vectorSpaceCols; c++){
