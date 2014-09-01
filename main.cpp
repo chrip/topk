@@ -30,8 +30,18 @@ public:
 
 float innerProduct(const vec* lhs, const vec* rhs) {
     float res = 0;
-    for(int r = 0; r < vectorSpaceRows; r++) {
+    int rows = lhs->size();
+    for(int r = 0; r < rows; r++) {
       res += lhs->at(r) * rhs->at(r);
+    }
+    return res;
+}
+
+float sum(const vec* v, int startRow) {
+    int endRow = startRow + compressionRows;
+    float res = 0;
+    for(int r = startRow; r < endRow; r++) {
+      res += v->at(r);
     }
     return res;
 }
@@ -61,6 +71,33 @@ vecVec* compressMatrix(const vecVec* matrix) {
     }
   }
   return compressedMatrix;
+}
+
+vec* compressQuery(const vec* queryVec) {
+
+  const int newRows = queryVec->size()/compressionRows;
+  vec* compressedQuery = new vec();
+  for(int r = 0; r < newRows; r++){
+    compressedQuery->push_back(sum(queryVec, r*compressionRows));
+  }
+  return compressedQuery;
+}
+
+void findTopK(vecVecVec* vectorSpacePyramide, vecVec* queryPyramide, intFloatQueue& topKQueue, int startCol, int endCol, int level)
+{
+    for(int c = startCol; c < endCol; c++){
+        float p = innerProduct(queryPyramide->at(level), vectorSpacePyramide->at(level)->at(c));
+        std::cout << "level:" << level << " col:" << c << " val:" << p << "\n";
+        if(p > topKQueue.top().second){
+           if(level == 0){
+               topKQueue.pop();
+               topKQueue.push({c,p});
+           }
+           else {
+               findTopK(vectorSpacePyramide, queryPyramide, topKQueue, c*compressionCols, c*compressionCols+compressionCols,  level-1);
+           }
+        }
+    }
 }
 
 int main ()
@@ -93,20 +130,20 @@ int main ()
     std::cout << query->at(r) << std::endl;
   }
   
+  vecVec* queryPyramide = new vecVec();
+  queryPyramide->push_back(query);
+  for(int level = 1; level < compressionLevels; level++){
+      queryPyramide->push_back(compressQuery(queryPyramide->at(level-1)));
+  }
+
   vecVecVec* vectorSpacePyramide = new vecVecVec();
   vectorSpacePyramide->push_back(vectorSpace);
   for(int level = 1; level < compressionLevels; level++){
       vectorSpacePyramide->push_back(compressMatrix(vectorSpacePyramide->at(level-1)));
   }
   
-  for(int c = 0; c < vectorSpaceCols; c++){
-      float p = innerProduct(query, vectorSpace->at(c));
-      std::cout << topKQueue.top().second << "=" << p << "\t";
-      if(p > topKQueue.top().second){
-         topKQueue.pop();
-         topKQueue.push({c,p});
-      }
-  }
+  findTopK(vectorSpacePyramide, queryPyramide, topKQueue, 0, vectorSpacePyramide->at(compressionLevels-1)->size(), compressionLevels-1);
+
   std::cout << std::endl;
   while (!topKQueue.empty())
   {
@@ -119,8 +156,9 @@ int main ()
           vectorSpacePyramide->at(level)->at(c)->clear();
       }
       vectorSpacePyramide->at(level)->clear();
+      queryPyramide->at(level)->clear();
   }
   vectorSpacePyramide->clear();
-  query->clear();
+  queryPyramide->clear();
   return 0;
 }
