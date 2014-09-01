@@ -9,17 +9,15 @@ class IntFloatComparison;
 
 typedef std::pair<int,float> intFloat;
 typedef std::priority_queue<intFloat, std::vector<intFloat>, IntFloatComparison> intFloatQueue;
-typedef std::vector<float>* vecPtr;
-typedef std::vector<vecPtr>* vecVecPtr;
-typedef std::vector<vecVecPtr>* vecVecVecPtr;
+typedef std::vector<float> vec;
+typedef std::vector<vec*> vecVec;
+typedef std::vector<vecVec*> vecVecVec;
 static const int k = 3;
 static const int vectorSpaceRows = 8;
 static const int vectorSpaceCols = 6;
-static const int compressionRows = 1000;
-static const int compressionCols = 1000;
+static const int compressionRows = 2;
+static const int compressionCols = 3;
 static const int compressionLevels = 2;
-
-static vecVecVecPtr vectorSpacePyramide;
 
 class IntFloatComparison
 {
@@ -30,17 +28,17 @@ public:
   }
 };
 
-static float innerProduct(const float* lhs, const float* rhs) {
+float innerProduct(const vec* lhs, const vec* rhs) {
     float res = 0;
     for(int r = 0; r < vectorSpaceRows; r++) {
-      res += lhs[r] * rhs[r];
+      res += lhs->at(r) * rhs->at(r);
     }
     return res;
-};
+}
 
-static float maxInBlock(const vecVecPtr matrix, int startRow, int startCol) {
-  int endRow = startRow + compressionRows;
+float maxInBlock(const vecVec* matrix, int startCol, int startRow) {
   int endCol = startCol + compressionCols;
+  int endRow = startRow + compressionRows;
   float m = 0;
   for(int c = startCol; c < endCol; c++){
     for(int r = startRow; r < endRow; r++){
@@ -48,19 +46,18 @@ static float maxInBlock(const vecVecPtr matrix, int startRow, int startCol) {
     }
   }
   return m;
-};
+}
 
-const vecVecPtr compressMatrix(const vecVecPtr matrix, int matrixRows, int matrixCols, int level) {
-  if (level == 0) {
-    return matrix;
-  }
-  const int newCols = matrixCols/compressionCols;
-  const int newRows = matrixRows/compressionRows;
+vecVec* compressMatrix(const vecVec* matrix) {
 
-  vecVecPtr compressedMatrix = new std::vector<std::vector<float>*>();
+  const int newCols = matrix->size()/compressionCols;
+  const int newRows = matrix->at(0)->size()/compressionRows;
+
+  vecVec* compressedMatrix = new vecVec();
   for(int c = 0; c < newCols; c++){
+    compressedMatrix->push_back(new vec());
     for(int r = 0; r < newRows; r++){
-        compressedMatrix->at(c)->at(r) = maxInBlock(matrix, c*compressionCols, r*compressionRows);
+        compressedMatrix->at(c)->push_back(maxInBlock(matrix, c*compressionCols, r*compressionRows));
     }
   }
   return compressedMatrix;
@@ -74,33 +71,36 @@ int main ()
       topKQueue.push({0,0});
   }
   
-  auto vectorSpace = new float[vectorSpaceCols][vectorSpaceRows]();
-  float* query = new float[vectorSpaceRows];
+  vecVec* vectorSpace = new vecVec();
+  vec* query = new vec();
 
   srand(42);
   for(int i = 0; i < vectorSpaceCols; i++){
+    vectorSpace->push_back(new vec());
     for(int j = 0; j < vectorSpaceRows; j++){
-      vectorSpace[i][j] = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+      vectorSpace->at(i)->push_back(static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
     }
   }
   for(int c = 0; c < vectorSpaceCols; c++) {
     for(int r = 0; r < vectorSpaceRows; r++){
-      std::cout << vectorSpace[c][r] << "\t";
+      std::cout << vectorSpace->at(c)->at(r) << "\t";
     }
   std::cout << std::endl;
   }
   std::cout << std::endl;
   for(int r = 0; r < vectorSpaceRows; r++) {
-    query[r] = r;
-    std::cout << query[r] << std::endl;
+    query->push_back(r);
+    std::cout << query->at(r) << std::endl;
   }
   
-  for(int level = 0; level < compressionLevels; level++){
-      
+  vecVecVec* vectorSpacePyramide = new vecVecVec();
+  vectorSpacePyramide->push_back(vectorSpace);
+  for(int level = 1; level < compressionLevels; level++){
+      vectorSpacePyramide->push_back(compressMatrix(vectorSpacePyramide->at(level-1)));
   }
   
   for(int c = 0; c < vectorSpaceCols; c++){
-      float p = innerProduct(query, vectorSpace[c]);
+      float p = innerProduct(query, vectorSpace->at(c));
       std::cout << topKQueue.top().second << "=" << p << "\t";
       if(p > topKQueue.top().second){
          topKQueue.pop();
@@ -114,7 +114,13 @@ int main ()
      topKQueue.pop();
   }
   std::cout << '\n';
-  delete[] vectorSpace;
-  delete[] query;
+  for(int level = 0; level < compressionLevels; level++){
+      for(int c = 0; c < vectorSpacePyramide->at(level)->size(); c++){
+          vectorSpacePyramide->at(level)->at(c)->clear();
+      }
+      vectorSpacePyramide->at(level)->clear();
+  }
+  vectorSpacePyramide->clear();
+  query->clear();
   return 0;
 }
