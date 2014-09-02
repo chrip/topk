@@ -19,3 +19,14 @@
 *.exe
 *.out
 *.app
+
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
+install_manifest.txt
+
+*~
+build-topk-Desktop-Default/*
+gtest-1.7.0/*
+CMakeLists.txt.user
