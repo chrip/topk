@@ -66,6 +66,47 @@ TEST(tkqTest, topk) {
     delete qv;
 }
 
+TEST(tkqTest, big_topk) {
+
+    size_t compressionBlockCols = 100;
+    size_t compressionBlockRows = 10;
+    const size_t compressionLevels = 2;
+
+    size_t vectorSpaceCols = 21212;
+    size_t vectorSpaceRows = 1000;
+
+    vec* query = new vec();
+
+    srand(42);
+    for(size_t j = 0; j < vectorSpaceRows; j++){
+        query->push_back(static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
+    }
+
+    QueryVector* qv = new QueryVector(query, compressionBlockRows , compressionLevels);
+    Vectorspace* vs = new Vectorspace(compressionBlockRows, compressionBlockCols, compressionLevels);
+    for(size_t i = 0; i < vectorSpaceCols; i++){
+        vec* col = new vec();
+        for(size_t j = 0; j < vectorSpaceRows; j++){
+            col->push_back(static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
+        }
+        vs->addColumn(col);
+    }
+    vs->buildPyramide();
+
+    size_t topK = 2;
+    TopKQueue topKQueue = TopKQueue(topK, compressionBlockCols);
+    topKQueue.findTopK(vs,qv);
+    ASSERT_EQ("[1759 266.816772] [435 266.692963] ", topKQueue.toString());
+
+    topK = 3;
+    topKQueue = TopKQueue(topK, compressionBlockCols);
+    topKQueue.findTopK(vs,qv);
+    ASSERT_EQ("[1759 266.816772] [435 266.692963] [10805 265.252289] ", topKQueue.toString());
+
+    delete vs;
+    delete qv;
+}
+
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

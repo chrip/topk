@@ -16,7 +16,7 @@ void TopKQueue::findTopK(const Vectorspace* vs, const QueryVector* qv, size_t st
     size_t newEndCol = std::min(endCol, vs->getVectorSpacePyramide()->at(level)->size());
     for(size_t c = startCol; c < newEndCol; c++){
         float p = vs->innerProduct(qv, level, c);
-        std::cout << "level:" << level << " col:" << c << " val:" << p << "\n";
+        //std::cout << "level:" << level << " col:" << c << " val:" << p << "\n";
         if(p > _topKQueue.top().second){
             if(level == 0){
                 _topKQueue.pop();
