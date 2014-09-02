@@ -12,31 +12,29 @@ typedef std::pair<int,float> intFloat;
 
 class TopKQueue
 {
-    public:
+public:
     class IntFloatComparison
     {
     public:
-      bool operator() (const intFloat& lhs, const intFloat& rhs) const
-      {
-        return (lhs.second > rhs.second);
-      }
+        bool operator() (const intFloat& lhs, const intFloat& rhs) const
+        {
+            return (lhs.second > rhs.second);
+        }
     };
 
-  typedef std::priority_queue<intFloat, std::vector<intFloat>, IntFloatComparison> intFloatQueue;
+    typedef std::priority_queue<intFloat, std::vector<intFloat>, IntFloatComparison> intFloatQueue;
 
     TopKQueue(size_t topK, size_t compressionBlockCols);
-    size_t _topK;
     void findTopK(const Vectorspace* vs, const QueryVector* qv);
-
+    std::string toString();
 
 private:
-   size_t _compressionBlockCols;
-   intFloatQueue _topKQueue;
-
-   void findTopK(const Vectorspace* vs, const QueryVector* qv, int startCol, int endCol, int level);
+    size_t _topK;
+    size_t _compressionBlockCols;
+    intFloatQueue _topKQueue;
+    void findTopK(const Vectorspace* vs, const QueryVector* qv, size_t startCol, size_t endCol, size_t level);
 
 };
-
 
 
 #endif // TOPKQUEUE_H

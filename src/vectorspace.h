@@ -15,12 +15,13 @@ public:
     const size_t getHighestCompressionCols() const {return _vectorSpacePyramide->at(_compressionLevels)->size(); }
     const size_t getCompressionLevels() const {return _compressionLevels; }
     float innerProduct(const QueryVector* queryVector, const size_t level, const size_t column) const;
+    void buildPyramide();
 
 private:
 
     float maxInBlock(const vecVec* matrix, int startCol, int startRow);
     vecVec* compressMatrix(const vecVec* matrix);
-    void buildPyramide();
+
 
     size_t _numRows;
     size_t _numCols;

@@ -3,10 +3,16 @@
 # Unit Tests
 ################################
 include_directories(../src)
-aux_source_directory(../src SRC_LIST)
-# Add test cpp file
-add_executable( vectorspace_test vectorspace_test.cpp ${SRC_LIST})
-# Link test executable against gtest & gtest_main
-target_link_libraries(vectorspace_test gtest gtest_main)
-add_test( vectorspace_test vectorspace_test )
 
+
+add_executable( vectorspace_test vectorspace_test.cpp)
+target_link_libraries(vectorspace_test ${PROJECT_NAME} gtest gtest_main)
+add_test(NAME vectorspace COMMAND vectorspace_test)
+
+add_executable( queryvector_test queryvector_test.cpp)
+target_link_libraries(queryvector_test ${PROJECT_NAME} gtest gtest_main)
+add_test(NAME queryvector COMMAND queryvector_test)
+
+add_executable( topkqueue_test topkqueue_test.cpp)
+target_link_libraries(topkqueue_test ${PROJECT_NAME} gtest gtest_main)
+add_test(NAME topkqueue COMMAND topkqueue_test)

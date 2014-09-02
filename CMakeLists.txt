@@ -6,15 +6,16 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall")
 set(CMAKE_BUILD_TYPE "Debug")
 add_definitions(-std=c++11)
-
+add_subdirectory(src)
 
 ################################
 # GTest
 ################################
-add_subdirectory(gtest-1.7.0)
-enable_testing()
-include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
-################################
+if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
+    enable_testing()
+    add_subdirectory(gtest-1.7.0)
 
-add_subdirectory(src)
-add_subdirectory(test)
+    include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+    add_subdirectory(test)
+endif()
+

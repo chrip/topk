@@ -1,4 +1,5 @@
 #include "queryvector.h"
+#include "math.h"
 
 QueryVector::QueryVector(vec *col, const size_t compressionBlockRows, const size_t compressionLevels)
     : _queryPyramide(new vecVec())
@@ -11,27 +12,26 @@ QueryVector::QueryVector(vec *col, const size_t compressionBlockRows, const size
 
 void QueryVector::buildPyramide(vec* col){
     _queryPyramide->push_back(col);
-    for(size_t level = 1; level < _compressionLevels; level++){
+    for(size_t level = 1; level <= _compressionLevels; level++){
         _queryPyramide->push_back(this->compressVector(_queryPyramide->at(level-1)));
     }
 }
 
 
 vec* QueryVector::compressVector(const vec* queryVec) {
-
-  const int newRows = queryVec->size()/_compressionBlockRows;
-  vec* compressedQuery = new vec();
-  for(int r = 0; r < newRows; r++){
-    compressedQuery->push_back(this->sum(queryVec, r*_compressionBlockRows));
-  }
-  return compressedQuery;
+    const int newRows = static_cast<int>(ceil(static_cast<float>(queryVec->size())/_compressionBlockRows));
+    vec* compressedQuery = new vec();
+    for(int r = 0; r < newRows; r++){
+        compressedQuery->push_back(this->sum(queryVec, r*_compressionBlockRows));
+    }
+    return compressedQuery;
 }
 
 float QueryVector::sum(const vec* v, int startRow) {
     int endRow = std::min(startRow + _compressionBlockRows, v->size());
     float res = 0;
     for(int r = startRow; r < endRow; r++) {
-      res += v->at(r);
+        res += v->at(r);
     }
     return res;
 }
