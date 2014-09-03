@@ -11,46 +11,46 @@ TEST(tkqTest, topk) {
     size_t compressionBlockRows = 3;
     const size_t compressionLevels = 2;
 
-    vec* query = new vec {1,2,3,4};
-    QueryVector* qv = new QueryVector(query, compressionBlockRows , compressionLevels);
-    Vectorspace* vs = new Vectorspace(compressionBlockRows, compressionBlockCols, compressionLevels);
-    vec* col0 = new vec {1,1,1,1};
-    vs->addColumn(col0);
-    vec* col1 = new vec {1,2,1,1};
-    vs->addColumn(col1);
-    vec* col2 = new vec {0,0,0,1};
-    vs->addColumn(col2);
-    vec* col3 = new vec {1,0,1,0};
-    vs->addColumn(col3);
-    vs->buildPyramide();
+    vec query = vec {1,2,3,4};
+    QueryVector qv = QueryVector(query, compressionBlockRows , compressionLevels);
+    Vectorspace vs = Vectorspace(compressionBlockRows, compressionBlockCols, compressionLevels);
+    vec col0 = vec {1,1,1,1};
+    vs.addColumn(col0);
+    vec col1 = vec {1,2,1,1};
+    vs.addColumn(col1);
+    vec col2 = vec {0,0,0,1};
+    vs.addColumn(col2);
+    vec col3 = vec {1,0,1,0};
+    vs.addColumn(col3);
+    vs.buildPyramide();
 
     // col 0 at level 0
     // 1*1 + 2*1 + 3*1 + 4*1 = 1 + 2 + 3 + 4 = 10
-    ASSERT_EQ(10, vs->innerProduct(qv, 0, 0));
+    ASSERT_EQ(10, vs.innerProduct(qv, 0, 0));
 
     // col 1 at level 0
     // 1*1 + 2*2 + 3*1 + 4*1 = 1 + 4 + 3 + 4 = 12
-    ASSERT_EQ(12, vs->innerProduct(qv, 0, 1));
+    ASSERT_EQ(12, vs.innerProduct(qv, 0, 1));
 
     // col 2 at level 0
     // 1*0 + 2*0 + 3*0 + 4*1 = 0 + 0 + 0 + 4 = 4
-    ASSERT_EQ(4, vs->innerProduct(qv, 0, 2));
+    ASSERT_EQ(4, vs.innerProduct(qv, 0, 2));
 
     // col 3 at level 0
     // 1*1 + 2*0 + 3*1 + 4*0 = 1 + 0 + 3 + 4 = 4
-    ASSERT_EQ(4, vs->innerProduct(qv, 0, 2));
+    ASSERT_EQ(4, vs.innerProduct(qv, 0, 2));
 
     // col 0 at level 1
     // 6*2 + 4*1 = 12 + 4 = 16
-    ASSERT_EQ(16, vs->innerProduct(qv, 1, 0));
+    ASSERT_EQ(16, vs.innerProduct(qv, 1, 0));
 
     // col 1 at level 1
     // 6*1 + 4*0 = 6 + 0 = 6
-    ASSERT_EQ(6, vs->innerProduct(qv, 1, 1));
+    ASSERT_EQ(6, vs.innerProduct(qv, 1, 1));
 
     // col 0 at level 2
     // 10*2 = 20
-    ASSERT_EQ(20, vs->innerProduct(qv, 2, 0));
+    ASSERT_EQ(20, vs.innerProduct(qv, 2, 0));
 
     size_t topK = 2;
     TopKQueue topKQueue = TopKQueue(topK, compressionBlockCols);
@@ -62,8 +62,6 @@ TEST(tkqTest, topk) {
     topKQueue.findTopK(vs,qv);
     ASSERT_EQ("[1 12.000000] [0 10.000000] [2 4.000000] ", topKQueue.toString());
 
-    delete vs;
-    delete qv;
 }
 
 TEST(tkqTest, big_topk) {
@@ -75,23 +73,23 @@ TEST(tkqTest, big_topk) {
     size_t vectorSpaceCols = 21212;
     size_t vectorSpaceRows = 1000;
 
-    vec* query = new vec();
+    vec query = vec();
 
     srand(42);
     for(size_t j = 0; j < vectorSpaceRows; j++){
-        query->push_back(static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
+        query.push_back(static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
     }
 
-    QueryVector* qv = new QueryVector(query, compressionBlockRows , compressionLevels);
-    Vectorspace* vs = new Vectorspace(compressionBlockRows, compressionBlockCols, compressionLevels);
+    QueryVector qv = QueryVector(query, compressionBlockRows , compressionLevels);
+    Vectorspace vs = Vectorspace(compressionBlockRows, compressionBlockCols, compressionLevels);
     for(size_t i = 0; i < vectorSpaceCols; i++){
-        vec* col = new vec();
+        vec col = vec();
         for(size_t j = 0; j < vectorSpaceRows; j++){
-            col->push_back(static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
+            col.push_back(static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
         }
-        vs->addColumn(col);
+        vs.addColumn(col);
     }
-    vs->buildPyramide();
+    vs.buildPyramide();
 
     size_t topK = 2;
     TopKQueue topKQueue = TopKQueue(topK, compressionBlockCols);
@@ -103,8 +101,6 @@ TEST(tkqTest, big_topk) {
     topKQueue.findTopK(vs,qv);
     ASSERT_EQ("[1759 266.816772] [435 266.692963] [10805 265.252289] ", topKQueue.toString());
 
-    delete vs;
-    delete qv;
 }
 
 int main(int argc, char **argv) {

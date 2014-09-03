@@ -10,17 +10,17 @@ public:
     Vectorspace(size_t compressionBlockRows, size_t compressionBlockCols, size_t compressionLevels);
     ~Vectorspace();
 
-    void addColumn(vec *col);
-    const vecVecVec* getVectorSpacePyramide() const { return _vectorSpacePyramide; }
-    const size_t getHighestCompressionCols() const {return _vectorSpacePyramide->at(_compressionLevels)->size(); }
+    void addColumn(const vec& col);
+    const vecVecVec& getVectorSpacePyramide() const { return _vectorSpacePyramide; }
+    const size_t getHighestCompressionCols() const {return _vectorSpacePyramide.at(_compressionLevels).size(); }
     const size_t getCompressionLevels() const {return _compressionLevels; }
-    float innerProduct(const QueryVector* queryVector, const size_t level, const size_t column) const;
+    float innerProduct(const QueryVector& queryVector, const size_t level, const size_t column) const;
     void buildPyramide();
 
 private:
 
-    float maxInBlock(const vecVec* matrix, int startCol, int startRow);
-    vecVec* compressMatrix(const vecVec* matrix);
+    float maxInBlock(const vecVec& matrix, int startCol, int startRow);
+    void compressMatrix(const vecVec& matrix);
 
 
     size_t _numRows;
@@ -29,7 +29,7 @@ private:
     size_t _compressionBlockCols;
     size_t _compressionLevels;
 
-    vecVecVec* _vectorSpacePyramide;
+    vecVecVec _vectorSpacePyramide;
 };
 
 #endif // VECTORSPACE_H

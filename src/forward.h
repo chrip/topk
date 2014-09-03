@@ -6,7 +6,7 @@
 #include <iostream>
 
 typedef std::vector<float> vec;
-typedef std::vector<vec*> vecVec;
-typedef std::vector<vecVec*> vecVecVec;
+typedef std::vector<vec> vecVec;
+typedef std::vector<vecVec> vecVecVec;
 
 #endif // FORWARD_H

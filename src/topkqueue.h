@@ -25,14 +25,14 @@ public:
     typedef std::priority_queue<intFloat, std::vector<intFloat>, IntFloatComparison> intFloatQueue;
 
     TopKQueue(size_t topK, size_t compressionBlockCols);
-    void findTopK(const Vectorspace* vs, const QueryVector* qv);
+    void findTopK(const Vectorspace& vs, const QueryVector& qv);
     std::string toString();
 
 private:
     size_t _topK;
     size_t _compressionBlockCols;
     intFloatQueue _topKQueue;
-    void findTopK(const Vectorspace* vs, const QueryVector* qv, size_t startCol, size_t endCol, size_t level);
+    void findTopK(const Vectorspace& vs, const QueryVector& qv, size_t startCol, size_t endCol, size_t level);
 
 };
 

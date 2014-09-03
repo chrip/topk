@@ -8,14 +8,14 @@ TopKQueue::TopKQueue(size_t topK, size_t compressionBlockCols):_topK(topK), _com
     }
 }
 
-void TopKQueue::findTopK(const Vectorspace* vs, const QueryVector* qv) {
-    this->findTopK(vs, qv, 0, vs->getHighestCompressionCols(), vs->getCompressionLevels());
+void TopKQueue::findTopK(const Vectorspace& vs, const QueryVector& qv) {
+    this->findTopK(vs, qv, 0, vs.getHighestCompressionCols(), vs.getCompressionLevels());
 }
 
-void TopKQueue::findTopK(const Vectorspace* vs, const QueryVector* qv, size_t startCol, size_t endCol, size_t level) {
-    size_t newEndCol = std::min(endCol, vs->getVectorSpacePyramide()->at(level)->size());
+void TopKQueue::findTopK(const Vectorspace& vs, const QueryVector& qv, size_t startCol, size_t endCol, size_t level) {
+    size_t newEndCol = std::min(endCol, vs.getVectorSpacePyramide().at(level).size());
     for(size_t c = startCol; c < newEndCol; c++){
-        float p = vs->innerProduct(qv, level, c);
+        float p = vs.innerProduct(qv, level, c);
         //std::cout << "level:" << level << " col:" << c << " val:" << p << "\n";
         if(p > _topKQueue.top().second){
             if(level == 0){
