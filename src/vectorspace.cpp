@@ -2,22 +2,25 @@
 #include "queryvector.h"
 #include "math.h"
 
-Vectorspace::Vectorspace(size_t compressionBlockRows, size_t compressionBlockCols, size_t compressionLevels)
-    : _compressionBlockRows(compressionBlockRows)
-    , _compressionBlockCols (compressionBlockCols)
-    , _compressionLevels(compressionLevels)
-    , _vectorSpacePyramide(vecVecVec())
+Vectorspace::Vectorspace()
+    : _vectorSpacePyramide(vecVecVec())
 {
     _vectorSpacePyramide.push_back(vecVec()); // add empty matrix for compression level 0
 }
 
-Vectorspace::~Vectorspace(){
-    for(size_t level = 0; level < _vectorSpacePyramide.size(); level++){
+void Vectorspace::clearPyramide(size_t fromLevel, size_t toLevel)
+{
+    for(size_t level = fromLevel; level < toLevel; level++){
         for(size_t c = 0; c < _vectorSpacePyramide[level].size(); c++){
             _vectorSpacePyramide[level][c].clear();
         }
         _vectorSpacePyramide[level].clear();
     }
+    _vectorSpacePyramide.erase(_vectorSpacePyramide.begin()+fromLevel,_vectorSpacePyramide.begin()+toLevel);
+}
+
+Vectorspace::~Vectorspace(){
+    this->clearPyramide(0, _vectorSpacePyramide.size());
     _vectorSpacePyramide.clear();
 }
 
@@ -64,7 +67,11 @@ void Vectorspace::compressMatrix(const vecVec& matrix) {
     _vectorSpacePyramide.push_back(compressedMatrix);
 }
 
-void Vectorspace::buildPyramide(){
+void Vectorspace::buildPyramide(size_t compressionBlockRows, size_t compressionBlockCols, size_t compressionLevels){
+    _compressionBlockRows = compressionBlockRows;
+    _compressionBlockCols = compressionBlockCols;
+    _compressionLevels = compressionLevels;
+    this->clearPyramide(1, _vectorSpacePyramide.size());
     for(size_t level = 1; level <= _compressionLevels; level++){
         this->compressMatrix(_vectorSpacePyramide[level-1]);
     }

@@ -13,7 +13,7 @@ TEST(tkqTest, topk) {
 
     vec query = vec {1,2,3,4};
     QueryVector qv = QueryVector(query, compressionBlockRows , compressionLevels);
-    Vectorspace vs = Vectorspace(compressionBlockRows, compressionBlockCols, compressionLevels);
+    Vectorspace vs = Vectorspace();
     vec col0 = vec {1,1,1,1};
     vs.addColumn(col0);
     vec col1 = vec {1,2,1,1};
@@ -22,7 +22,7 @@ TEST(tkqTest, topk) {
     vs.addColumn(col2);
     vec col3 = vec {1,0,1,0};
     vs.addColumn(col3);
-    vs.buildPyramide();
+    vs.buildPyramide(compressionBlockRows, compressionBlockCols, compressionLevels);
 
     // col 0 at level 0
     // 1*1 + 2*1 + 3*1 + 4*1 = 1 + 2 + 3 + 4 = 10
@@ -81,7 +81,7 @@ TEST(tkqTest, big_topk) {
     }
 
     QueryVector qv = QueryVector(query, compressionBlockRows , compressionLevels);
-    Vectorspace vs = Vectorspace(compressionBlockRows, compressionBlockCols, compressionLevels);
+    Vectorspace vs = Vectorspace();
     for(size_t i = 0; i < vectorSpaceCols; i++){
         vec col = vec();
         for(size_t j = 0; j < vectorSpaceRows; j++){
@@ -89,7 +89,7 @@ TEST(tkqTest, big_topk) {
         }
         vs.addColumn(col);
     }
-    vs.buildPyramide();
+    vs.buildPyramide(compressionBlockRows, compressionBlockCols, compressionLevels);
 
     size_t topK = 2;
     TopKQueue topKQueue = TopKQueue(topK, compressionBlockCols);

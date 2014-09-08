@@ -7,7 +7,7 @@ class QueryVector;
 class Vectorspace
 {
 public:
-    Vectorspace(size_t compressionBlockRows, size_t compressionBlockCols, size_t compressionLevels);
+    Vectorspace();
     ~Vectorspace();
 
     void addColumn(const vec& col);
@@ -15,8 +15,9 @@ public:
     const size_t getHighestCompressionCols() const {return _vectorSpacePyramide[_compressionLevels].size(); }
     const size_t getCompressionLevels() const {return _compressionLevels; }
     float innerProduct(const QueryVector& queryVector, const size_t level, const size_t column) const;
-    void buildPyramide();
+    void buildPyramide(size_t compressionBlockRows, size_t compressionBlockCols, size_t compressionLevels);
 
+    void clearPyramide(size_t fromLevel, size_t toLevel);
 private:
 
     float maxInBlock(const vecVec& matrix, int startCol, int startRow);

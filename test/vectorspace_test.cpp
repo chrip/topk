@@ -4,10 +4,7 @@
 
 
 TEST(vsTest, addCol) {
-    size_t compressionBlockRows = 4;
-    size_t compressionBlockCols = 3;
-    size_t compressionLevels = 2;
-    Vectorspace vs = Vectorspace(compressionBlockRows, compressionBlockCols, compressionLevels);
+    Vectorspace vs = Vectorspace();
 
     size_t vectorSpaceCols = 8;
     size_t vectorSpaceRows = 11;
@@ -32,7 +29,7 @@ TEST(vsTest, pyramideSizeTest) {
     size_t compressionBlockRows = 4;
     size_t compressionBlockCols = 3;
     size_t compressionLevels = 2;
-    Vectorspace vs = Vectorspace(compressionBlockRows, compressionBlockCols, compressionLevels);
+    Vectorspace vs = Vectorspace();
 
     size_t vectorSpaceCols = 12;
     size_t vectorSpaceRows = 11;
@@ -44,7 +41,7 @@ TEST(vsTest, pyramideSizeTest) {
         }
         vs.addColumn(col);
     }
-    vs.buildPyramide();
+    vs.buildPyramide(compressionBlockRows, compressionBlockCols, compressionLevels);
 
     // the pyramide has 3 levels
     ASSERT_EQ(3, vs.getVectorSpacePyramide().size());
@@ -76,7 +73,7 @@ TEST(vsTest, pyramideContentTest) {
     size_t compressionBlockRows = 2;
     size_t compressionBlockCols = 3;
     size_t compressionLevels = 2;
-    Vectorspace vs = Vectorspace(compressionBlockRows, compressionBlockCols, compressionLevels);
+    Vectorspace vs = Vectorspace();
 
 
     vec col0 = vec {1,2,1,1,1};
@@ -84,7 +81,7 @@ TEST(vsTest, pyramideContentTest) {
     vec col1 = vec {1,1,1,1,1};
     vs.addColumn(col1);
 
-    vs.buildPyramide();
+    vs.buildPyramide(compressionBlockRows, compressionBlockCols, compressionLevels);
 
     // level 1:
     // 1,1
@@ -121,6 +118,33 @@ TEST(vsTest, pyramideContentTest) {
 
 }
 
+TEST(vsTest, pyramideRebuildTest) {
+    size_t compressionBlockRows = 2;
+    size_t compressionBlockCols = 3;
+    size_t compressionLevels = 2;
+    Vectorspace vs = Vectorspace();
+
+
+    vec col0 = vec {1,2,1,1,1};
+    vs.addColumn(col0);
+    vec col1 = vec {1,1,1,1,1};
+    vs.addColumn(col1);
+
+    vs.buildPyramide(compressionBlockRows, compressionBlockCols, compressionLevels);
+    ASSERT_EQ(1, vs.getVectorSpacePyramide()[0][0][0]);
+    ASSERT_EQ(2, vs.getVectorSpacePyramide()[1][0][0]);
+    ASSERT_EQ(1, vs.getVectorSpacePyramide()[1][0][1]);
+    ASSERT_EQ(1, vs.getVectorSpacePyramide()[1][0][2]);
+
+    // compress vector space with other parameters
+    vs.buildPyramide(compressionBlockRows+1, compressionBlockCols+1, compressionLevels+1);
+    ASSERT_EQ(1, vs.getVectorSpacePyramide()[0][0][0]);
+    ASSERT_EQ(2, vs.getVectorSpacePyramide()[1][0][0]);
+    ASSERT_EQ(1, vs.getVectorSpacePyramide()[1][0][1]);
+    ASSERT_EQ(1, vs.getVectorSpacePyramide()[1][0][2]);
+
+}
+
 TEST(vsTest, innerProductTest) {
 
     size_t compressionBlockCols = 3;
@@ -129,12 +153,12 @@ TEST(vsTest, innerProductTest) {
 
     vec query = vec {1,2,3,4};
     QueryVector qv = QueryVector(query, compressionBlockRows , compressionLevels);
-    Vectorspace vs = Vectorspace(compressionBlockRows, compressionBlockCols, compressionLevels);
+    Vectorspace vs = Vectorspace();
     vec col0 = vec {1,2,1,1};
     vs.addColumn(col0);
     vec col1 = vec {1,1,1,1};
     vs.addColumn(col1);
-    vs.buildPyramide();
+    vs.buildPyramide(compressionBlockRows, compressionBlockCols, compressionLevels);
 
     // col 0 at level 0
     // 1*1 + 2*2 + 3*1 + 4*1 = 1 + 4 + 3 + 4 = 12
