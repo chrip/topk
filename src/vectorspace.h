@@ -12,7 +12,7 @@ public:
 
     void addColumn(const vec& col);
     const vecVecVec& getVectorSpacePyramide() const { return _vectorSpacePyramide; }
-    const size_t getHighestCompressionCols() const {return _vectorSpacePyramide.at(_compressionLevels).size(); }
+    const size_t getHighestCompressionCols() const {return _vectorSpacePyramide[_compressionLevels].size(); }
     const size_t getCompressionLevels() const {return _compressionLevels; }
     float innerProduct(const QueryVector& queryVector, const size_t level, const size_t column) const;
     void buildPyramide();

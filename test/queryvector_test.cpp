@@ -13,13 +13,13 @@ TEST(qvTest, pyramideSizeTest) {
     ASSERT_EQ(3, qv.getQueryPyramide().size());
 
     // 7 rows @ level 0
-    ASSERT_EQ(7, qv.getQueryPyramide().at(0).size());
+    ASSERT_EQ(7, qv.getQueryPyramide()[0].size());
 
     // ceil(7/3) = 3 rows @ level 1
-    ASSERT_EQ(3, qv.getQueryPyramide().at(1).size());
+    ASSERT_EQ(3, qv.getQueryPyramide()[1].size());
 
     // ceil(ceil(7/3)/3) = 1  cols @ level 2
-    ASSERT_EQ(1, qv.getQueryPyramide().at(2).size());
+    ASSERT_EQ(1, qv.getQueryPyramide()[2].size());
 }
 
 TEST(qvTest, pyramideContentTest) {
@@ -33,20 +33,20 @@ TEST(qvTest, pyramideContentTest) {
     // 2
     // 3
     // 4
-    ASSERT_EQ(1, qv.getQueryPyramide().at(0).at(0));
-    ASSERT_EQ(2, qv.getQueryPyramide().at(0).at(1));
-    ASSERT_EQ(3, qv.getQueryPyramide().at(0).at(2));
-    ASSERT_EQ(4, qv.getQueryPyramide().at(0).at(3));
+    ASSERT_EQ(1, qv.getQueryPyramide()[0][0]);
+    ASSERT_EQ(2, qv.getQueryPyramide()[0][1]);
+    ASSERT_EQ(3, qv.getQueryPyramide()[0][2]);
+    ASSERT_EQ(4, qv.getQueryPyramide()[0][3]);
 
     // the pyramide at level 1
     // 6
     // 4
-    ASSERT_EQ(6, qv.getQueryPyramide().at(1).at(0));
-    ASSERT_EQ(4, qv.getQueryPyramide().at(1).at(1));
+    ASSERT_EQ(6, qv.getQueryPyramide()[1][0]);
+    ASSERT_EQ(4, qv.getQueryPyramide()[1][1]);
 
     // the pyramide at level 2
     // 10
-    ASSERT_EQ(10, qv.getQueryPyramide().at(2).at(0));
+    ASSERT_EQ(10, qv.getQueryPyramide()[2][0]);
 
 }
 

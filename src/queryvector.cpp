@@ -13,7 +13,7 @@ QueryVector::QueryVector(const vec& col, const size_t compressionBlockRows, cons
 void QueryVector::buildPyramide(const vec& col){
     _queryPyramide.push_back(col);
     for(size_t level = 1; level <= _compressionLevels; level++){
-        this->compressVector(_queryPyramide.at(level-1));
+        this->compressVector(_queryPyramide[level-1]);
     }
 }
 
@@ -31,14 +31,14 @@ float QueryVector::sum(const vec& v, int startRow) {
     int endRow = std::min(startRow + _compressionBlockRows, v.size());
     float res = 0;
     for(int r = startRow; r < endRow; r++) {
-        res += v.at(r);
+        res += v[r];
     }
     return res;
 }
 
 QueryVector::~QueryVector(){
     for(size_t level = 0; level < _queryPyramide.size(); level++){
-        _queryPyramide.at(level).clear();
+        _queryPyramide[level].clear();
     }
     _queryPyramide.clear();
 }

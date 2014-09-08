@@ -13,7 +13,7 @@ void TopKQueue::findTopK(const Vectorspace& vs, const QueryVector& qv) {
 }
 
 void TopKQueue::findTopK(const Vectorspace& vs, const QueryVector& qv, size_t startCol, size_t endCol, size_t level) {
-    size_t newEndCol = std::min(endCol, vs.getVectorSpacePyramide().at(level).size());
+    size_t newEndCol = std::min(endCol, vs.getVectorSpacePyramide()[level].size());
     for(size_t c = startCol; c < newEndCol; c++){
         float p = vs.innerProduct(qv, level, c);
         //std::cout << "level:" << level << " col:" << c << " val:" << p << "\n";
@@ -26,6 +26,10 @@ void TopKQueue::findTopK(const Vectorspace& vs, const QueryVector& qv, size_t st
                 findTopK(vs, qv, c*_compressionBlockCols, c*_compressionBlockCols+_compressionBlockCols,  level-1);
             }
         }
+//        else{
+//           if(level != 0)
+//               std::cout << level << " " << c << std::endl;
+//        }
     }
 }
 
