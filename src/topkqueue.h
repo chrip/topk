@@ -28,10 +28,12 @@ public:
     void findTopK(const Vectorspace& vs, const QueryVector& qv);
     std::string toString();
 
-private:
+protected:
     size_t _topK;
     size_t _compressionBlockCols;
     intFloatQueue _topKQueue;
+
+private:
     void findTopK(const Vectorspace& vs, const QueryVector& qv, size_t startCol, size_t endCol, size_t level);
 
 };
