@@ -178,6 +178,44 @@ TEST(vsTest, innerProductTest) {
 
 }
 
+// Hölder's inequality
+// http://en.wikipedia.org/wiki/H%C3%B6lder%27s_inequality
+TEST(tkqTest,  HoeldersInequalityTest) {
+
+    size_t compressionBlockCols = 13;
+    size_t compressionBlockRows = 5;
+    const size_t compressionLevels = 3;
+
+    size_t vectorSpaceCols = 2197;
+    size_t vectorSpaceRows = 1000;
+
+    vec query = vec();
+
+    srand(43);
+    for(size_t j = 0; j < vectorSpaceRows; j++){
+        query.push_back(static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
+    }
+
+    QueryVector qv = QueryVector(query, compressionBlockRows , compressionLevels);
+    Vectorspace vs = Vectorspace();
+    for(size_t i = 0; i < vectorSpaceCols; i++){
+        vec col = vec();
+        for(size_t j = 0; j < vectorSpaceRows; j++){
+            col.push_back(static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
+        }
+        vs.addColumn(col);
+    }
+    vs.buildPyramide(compressionBlockRows, compressionBlockCols, compressionLevels);
+
+    // HoeldersInequality
+    for(size_t level = 0; level < compressionLevels; level++){
+        size_t cols = vs.getVectorSpacePyramide()[level].size();
+        for(size_t col = 0; col < cols; col++){
+           ASSERT_LE(vs.innerProduct(qv, level, col), vs.innerProduct(qv, level+1, col/compressionBlockCols));
+        }
+    }
+}
+
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
