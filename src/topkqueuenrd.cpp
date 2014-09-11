@@ -47,7 +47,6 @@ void TopKQueueNRD::findTopK(const Vectorspace& vs, const QueryVector& qv, size_t
     }
 
     float queryLogSum = log(std::accumulate(qv.getQueryPyramide()[0].begin(), qv.getQueryPyramide()[0].end(), 0.0f));
-    //float logTotalNumberOfDocs = log(vs.getVectorSpacePyramide()[0].size());
-    float logTotalNumberOfDocs = log(2000);
+    float logTotalNumberOfDocs = log(vs.getVectorSpacePyramide()[0].size());
     this->findTopNRD(vs, qv, startCol, endCol, level, queryLogSum, logTotalNumberOfDocs);
 }
