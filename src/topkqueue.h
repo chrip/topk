@@ -13,6 +13,8 @@ typedef std::pair<int,float> intFloat;
 class TopKQueue
 {
 public:
+
+    TopKQueue();
     class IntFloatComparison
     {
     public:
@@ -24,18 +26,17 @@ public:
 
     typedef std::priority_queue<intFloat, std::vector<intFloat>, IntFloatComparison> intFloatQueue;
 
-    TopKQueue(size_t topK, size_t compressionBlockCols);
-    void findTopK(const Vectorspace& vs, const QueryVector& qv);
     std::string toString();
 
+    void findTopK(const Vectorspace &vs, const QueryVector &qv, size_t topK, size_t compressionBlockCols);
+
+    virtual void addVectorToLookUp(const int id, const vec&);
+
 protected:
-    size_t _topK;
     size_t _compressionBlockCols;
     intFloatQueue _topKQueue;
-
-private:
-    void findTopK(const Vectorspace& vs, const QueryVector& qv, size_t startCol, size_t endCol, size_t level);
-
+    std::vector<int> _columnIdLookup; // look up table for the "real" ids
+    virtual void findTopK(const Vectorspace& vs, const QueryVector& qv, size_t startCol, size_t endCol, size_t level);
 };
 
 

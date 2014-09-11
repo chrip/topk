@@ -53,13 +53,13 @@ TEST(tkqTest, topk) {
     ASSERT_EQ(20, vs.innerProduct(qv, 2, 0));
 
     size_t topK = 2;
-    TopKQueue topKQueue = TopKQueue(topK, compressionBlockCols);
-    topKQueue.findTopK(vs,qv);
+    TopKQueue topKQueue = TopKQueue();
+    topKQueue.findTopK(vs, qv, topK, compressionBlockCols);
     ASSERT_EQ("[1 12.000000] [0 10.000000] ", topKQueue.toString());
 
     topK = 3;
-    topKQueue = TopKQueue(topK, compressionBlockCols);
-    topKQueue.findTopK(vs,qv);
+    topKQueue = TopKQueue();
+    topKQueue.findTopK(vs, qv, topK, compressionBlockCols);
     ASSERT_EQ("[1 12.000000] [0 10.000000] [2 4.000000] ", topKQueue.toString());
 
 }
@@ -92,13 +92,13 @@ TEST(tkqTest, big_topk) {
     vs.buildPyramide(compressionBlockRows, compressionBlockCols, compressionLevels);
 
     size_t topK = 2;
-    TopKQueue topKQueue = TopKQueue(topK, compressionBlockCols);
-    topKQueue.findTopK(vs,qv);
+    TopKQueue topKQueue = TopKQueue();
+    topKQueue.findTopK(vs, qv, topK, compressionBlockCols);
     ASSERT_EQ("[1759 266.816772] [435 266.692963] ", topKQueue.toString());
 
     topK = 3;
-    topKQueue = TopKQueue(topK, compressionBlockCols);
-    topKQueue.findTopK(vs,qv);
+    topKQueue = TopKQueue();
+    topKQueue.findTopK(vs, qv, topK, compressionBlockCols);
     ASSERT_EQ("[1759 266.816772] [435 266.692963] [10805 265.252289] ", topKQueue.toString());
 
 }
