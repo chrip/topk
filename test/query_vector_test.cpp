@@ -1,4 +1,4 @@
-#include "queryvector.h"
+#include "query_vector.h"
 #include "gtest/gtest.h"
 
 

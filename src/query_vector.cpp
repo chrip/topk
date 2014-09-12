@@ -1,4 +1,4 @@
-#include "queryvector.h"
+#include "query_vector.h"
 #include "math.h"
 
 QueryVector::QueryVector(const vec& col, const size_t compressionBlockRows, const size_t compressionLevels)

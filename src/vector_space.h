@@ -17,12 +17,12 @@ public:
     float innerProduct(const QueryVector& queryVector, const size_t level, const size_t column) const;
     void buildPyramide(size_t compressionBlockRows, size_t compressionBlockCols, size_t compressionLevels);
 
-    void clearPyramide(size_t fromLevel, size_t toLevel);
+
 private:
 
     float maxInBlock(const vecVec& matrix, int startCol, int startRow);
     void compressMatrix(const vecVec& matrix);
-
+    void clearPyramide(size_t fromLevel, size_t toLevel);
 
     size_t _numRows;
     size_t _numCols;

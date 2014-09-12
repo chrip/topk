@@ -1,5 +1,5 @@
-#include "vectorspace.h"
-#include "queryvector.h"
+#include "vector_space.h"
+#include "query_vector.h"
 #include "gtest/gtest.h"
 
 

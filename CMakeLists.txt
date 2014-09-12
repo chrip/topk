@@ -12,11 +12,11 @@ add_subdirectory(src)
 ################################
 # GTest
 ################################
-if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
+#if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
     enable_testing()
     add_subdirectory(gtest-1.7.0)
 
     include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
     add_subdirectory(test)
-endif()
+#endif()
 
