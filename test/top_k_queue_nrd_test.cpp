@@ -16,7 +16,6 @@ void stringToVec(const std::string& line, vec& vector)
     int i = 0;
     for( std::string val; std::getline(ss, val, ','); i++) {
         vector.push_back(std::stof(val));
-        //if(i==9999) break;
     }
 }
 
@@ -36,12 +35,10 @@ static double getTimestampInMilliseconds()
 
 TEST(tkqNrdTest, tryOutParameters) {
 
-
     size_t topK = 3;
-
     TopKQueueNRD tkqNRD = TopKQueueNRD();
 
-    //std::ifstream input0( "/home/chrisschaefer/workspace/topk/job.json" );
+//    std::ifstream input0( "/home/chrisschaefer/workspace/topk/job.json" );
     std::ifstream input0( "test_data/vector_space.json" );
     int i = 0;
     for( std::string line; getline( input0, line ); i++){
@@ -55,14 +52,13 @@ TEST(tkqNrdTest, tryOutParameters) {
     std::ifstream input1( "test_data/query_vector.json" );
     for( std::string line; getline( input1, line );)
     {
-
         vec vector = vec();
         stringToVec(line, vector);
 
         size_t compressionLevels = 0;
-        for(;compressionLevels < 4; compressionLevels++){
+        for(;compressionLevels < 10; compressionLevels++){
             size_t compressionBlockRows = 1;
-            for(;compressionBlockRows < 43; compressionBlockRows++){
+            for(;compressionBlockRows < 10; compressionBlockRows++){
                 size_t compressionBlockCols = 1;
                 for(;compressionBlockCols < 3; compressionBlockCols++){
 
@@ -73,24 +69,21 @@ TEST(tkqNrdTest, tryOutParameters) {
                     QueryVector qv = QueryVector(vector, compressionBlockRows, compressionLevels);
                     tkqNRD.executeTopK(qv, topK);
 
-                    std::cout << "compressionLevels: " << compressionLevels
-                              << ", compressionBlockCols: " << compressionBlockCols
-                              << ", compressionBlockRows: " << compressionBlockRows;
-
-
                     ASSERT_EQ(36100, getId(line));
                     ASSERT_EQ("[[2572694,0.1704],[2570094,0.1659],[2558895,0.1657]]", tkqNRD.toString())
-                    //ASSERT_EQ("[[2548890,0.3311],[2553413,0.2964],[2571922,0.2955]]", tkqNRD.toString())
+//                    ASSERT_EQ("[[2548890,0.3311],[2553413,0.2964],[2571922,0.2955]]", tkqNRD.toString())
                             << " level: " << compressionLevels
                             << " compressionBlockCols: " << compressionBlockCols
                             << " compressionBlockRows: " << compressionBlockRows;
                     end = getTimestampInMilliseconds();
-                    std::cout  << ", time: "  <<  (end - start) << " ms" << std::endl;
+                    std::cout << "compressionLevels: " << compressionLevels
+                              << ", compressionBlockCols: " << compressionBlockCols
+                              << ", compressionBlockRows: " << compressionBlockRows
+                              << ", time: "  <<  (end - start) << " ms" << std::endl;
                 }
             }
         }
     }
-
 }
 
 int main(int argc, char **argv) {
