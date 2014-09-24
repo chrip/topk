@@ -33,6 +33,8 @@ Server::Server(const std::string &pathToVectorSpaceData, int portNr) :
         _topKQueueNRD.addVector(util::getId(line),vector);
     }
     _topKQueueNRD.buildIndex(_compressionBlockRows, _compressionBlockCols, _compressionLevels);
+
+    _readBufferSize = _topKQueueNRD.getVectorSpace().getVectorSpacePyramide()[0][0].size() * 16;
     std::cout << _topKQueueNRD.getVectorSpaceSize() << " vectors of length " << _topKQueueNRD.getVectorSpace().getVectorSpacePyramide()[0][0].size() << std::endl;
 
     struct sockaddr_in serv_addr;
@@ -56,7 +58,7 @@ Server::Server(const std::string &pathToVectorSpaceData, int portNr) :
 
 void Server::communicate() {
     socklen_t clilen;
-    char buffer[64];
+    char buffer[_readBufferSize];
 	struct sockaddr_in cli_addr;
 	clilen = sizeof(cli_addr);
     ssize_t n; /* byte count or error */
@@ -67,14 +69,21 @@ void Server::communicate() {
 		std::cout << "ERROR on accept" << std::endl;
 	}
     while(1) {
-    	memset(buffer, 0, 64); // clear buffer
-		n = read(_newSockFd,buffer,63);
+		n = 0;
+    	memset(buffer, 0, _readBufferSize); // clear buffer
+        while(1) {
+		   n += read(_newSockFd,&buffer[n],(_readBufferSize-n)-1);
+		   std::cout << n << " " << buffer[n - 2] << std::endl;
+		   if (n < 0 || buffer[n - 2] == ']'){
+			   break;
+		   }
+		}
 		if (n < 0) {
 			std::cout << "ERROR reading from socket" << std::endl;
 			break;
 		}
-
 		std::string b(buffer);
+	std::cout << b << std::endl;
         vec v = vec();
         util::stringToVec(b, v);
 
@@ -87,6 +96,7 @@ void Server::communicate() {
 			std::cout << "ERROR writing to socket" << std::endl;
 			break;
 		}
+       std::cout << "OK!" << std::endl;
     }
 }
 
