@@ -16,7 +16,7 @@ private:
     size_t _compressionBlockCols = 1;
     size_t _compressionLevels = 2;
 
-    size_t _readBufferSize;
+    int _readBufferSize = 64000;
 };
 
 #endif // SERVER_H

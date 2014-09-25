@@ -19,9 +19,9 @@ public:
     }
 }
 
-static int getId(const std::string& line)
+static int getJsonInt(const std::string& line, const std::string& key)
 {
-    std::size_t begin = line.find("\"id\":")+5;
+    std::size_t begin = line.find("\"" + key + "\":") + key.size() + 3;
     std::size_t end = line.find(",", begin);
     return std::stoi(line.substr(begin, end-begin));
 }

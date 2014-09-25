@@ -26,15 +26,14 @@ Server::Server(const std::string &pathToVectorSpaceData, int portNr) :
     _topKQueueNRD()
 {
     std::ifstream input0(pathToVectorSpaceData);
+	std::cout << "Using index file " << pathToVectorSpaceData << std::endl;
     int i = 0;
     for( std::string line; getline( input0, line ); i++){
         vec vector = vec();
         util::stringToVec(line,vector);
-        _topKQueueNRD.addVector(util::getId(line),vector);
+        _topKQueueNRD.addVector(util::getJsonInt(line, "id"),vector);
     }
     _topKQueueNRD.buildIndex(_compressionBlockRows, _compressionBlockCols, _compressionLevels);
-
-    _readBufferSize = _topKQueueNRD.getVectorSpace().getVectorSpacePyramide()[0][0].size() * 16;
     std::cout << _topKQueueNRD.getVectorSpaceSize() << " vectors of length " << _topKQueueNRD.getVectorSpace().getVectorSpacePyramide()[0][0].size() << std::endl;
 
     struct sockaddr_in serv_addr;
@@ -53,7 +52,6 @@ Server::Server(const std::string &pathToVectorSpaceData, int portNr) :
 
     listen(_sockFd,5);
     std::cout << "Listening on port " << portNr << std::endl;
-
 }
 
 void Server::communicate() {
@@ -71,10 +69,9 @@ void Server::communicate() {
     while(1) {
 		n = 0;
     	memset(buffer, 0, _readBufferSize); // clear buffer
-        while(1) {
+		while (n < _readBufferSize) {
 		   n += read(_newSockFd,&buffer[n],(_readBufferSize-n)-1);
-		   std::cout << n << " " << buffer[n - 2] << std::endl;
-		   if (n < 0 || buffer[n - 2] == ']'){
+		   if (n < 0 || (buffer[n - 2] == ']' &&  buffer[n - 1] == '}')) {
 			   break;
 		   }
 		}
@@ -82,21 +79,25 @@ void Server::communicate() {
 			std::cout << "ERROR reading from socket" << std::endl;
 			break;
 		}
+
+		double startTs = util::getTimestampInMilliseconds();
+
 		std::string b(buffer);
-	std::cout << b << std::endl;
         vec v = vec();
         util::stringToVec(b, v);
 
         QueryVector qv = QueryVector(v, _compressionBlockRows, _compressionLevels);
-        _topKQueueNRD.executeTopK(qv, 20);
-        std::string result = _topKQueueNRD.toString();
+
+		int limit = util::getJsonInt(b, "limit");
+		_topKQueueNRD.executeTopK(qv, limit);
+        std::string result = _topKQueueNRD.toString() + "\n";
 
         n = write(_newSockFd, result.c_str(), result.size());
 		if (n < 0) {
 			std::cout << "ERROR writing to socket" << std::endl;
 			break;
 		}
-       std::cout << "OK!" << std::endl;
+		std::cout << (util::util::getTimestampInMilliseconds() - startTs) << "ms" << std::endl;
     }
 }
 

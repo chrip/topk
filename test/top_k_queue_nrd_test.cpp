@@ -18,7 +18,7 @@ TEST(tkqNrdTest, tryOutParameters) {
     for( std::string line; getline( input0, line ); i++){
         vec vector = vec();
         util::stringToVec(line,vector);
-        tkqNRD.addVector(util::getId(line),vector);
+        tkqNRD.addVector(util::getJsonInt(line, "id"),vector);
     }
 
     std::cout << tkqNRD.getVectorSpaceSize() << " vectors of length " << tkqNRD.getVectorSpace().getVectorSpacePyramide()[0][0].size() << std::endl;
@@ -43,7 +43,7 @@ TEST(tkqNrdTest, tryOutParameters) {
                     QueryVector qv = QueryVector(vector, compressionBlockRows, compressionLevels);
                     tkqNRD.executeTopK(qv, topK);
 
-                    ASSERT_EQ(36100, util::getId(line));
+                    ASSERT_EQ(36100, util::getJsonInt(line, "id"));
                     ASSERT_EQ("[[2572694,0.1704],[2570094,0.1659],[2558895,0.1657]]", tkqNRD.toString())
 //                    ASSERT_EQ("[[2548890,0.3311],[2553413,0.2964],[2571922,0.2955]]", tkqNRD.toString())
                             << " level: " << compressionLevels
