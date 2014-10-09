@@ -57,7 +57,12 @@ Server::Server(const std::string &pathToVectorSpaceData, uint16_t portNr) :
 void Server::communicate() {
     char buffer[BUFFER_SIZE];
 	struct sockaddr_in cli_addr;
-	int clilen = sizeof(cli_addr);
+#ifdef _WIN32
+	int clilen;
+#else
+	uint32_t clilen;
+#endif
+	clilen = sizeof(cli_addr);
 	_newSockFd = accept(_sockFd, (struct sockaddr *) &cli_addr, &clilen);
 	if (_newSockFd < 0) {
 		std::cout << "ERROR on accept" << std::endl;
