@@ -3,7 +3,6 @@
 #include "top_k_queue.h"
 
 #include "gtest/gtest.h"
-#include <random>
 
 TEST(tkqTest, topk) {
 
@@ -76,11 +75,8 @@ TEST(tkqTest, big_topk) {
 
     vec query = vec();
 
-	std::mt19937 engine(0); // Fixed seed of 0
-	std::uniform_real_distribution<> dist;
-
     for(size_t j = 0; j < vectorSpaceRows; j++){
-		query.push_back(static_cast<float>(dist(engine)));
+		query.push_back(j / static_cast<float>(vectorSpaceRows));
     }
 
     QueryVector qv = QueryVector(query, compressionBlockRows , compressionLevels);
@@ -88,7 +84,7 @@ TEST(tkqTest, big_topk) {
     for(size_t i = 0; i < vectorSpaceCols; i++){
         vec col = vec();
         for(size_t j = 0; j < vectorSpaceRows; j++){
-			col.push_back(static_cast<float>(dist(engine)));
+			col.push_back(i + j / static_cast<float>(vectorSpaceRows + vectorSpaceCols));
         }
         topKQueue.addVector(i,col);
     }
@@ -96,11 +92,11 @@ TEST(tkqTest, big_topk) {
 
     size_t topK = 2;
     topKQueue.executeTopK(qv, topK);
-    ASSERT_EQ("[[1759,266.8168],[435,266.6930]]", topKQueue.toString());
+    ASSERT_EQ("[[21211,10594911.0000],[21210,10594410.0000]]", topKQueue.toString());
 
     topK = 3;
     topKQueue.executeTopK(qv, topK);
-    ASSERT_EQ("[[1759,266.8168],[435,266.6930],[10805,265.2523]]", topKQueue.toString());
+    ASSERT_EQ("[[21211,10594911.0000],[21210,10594410.0000],[21209,10593910.0000]]", topKQueue.toString());
 
 }
 
