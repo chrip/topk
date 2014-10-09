@@ -14,7 +14,7 @@ void TopKQueue::executeTopK(const QueryVector& qv, size_t topK) {
 
 void TopKQueue::addVector(const int id, const vec& v) {
 	_tempIdVectorspace.insert({ id, v });
-	_tempIdValues.push_back(std::make_pair(id, std::accumulate(v.begin(), v.end(), 0.0f))); // other possibility is to count zeros...
+	_idVecSums.push_back(std::make_pair(id, std::accumulate(v.begin(), v.end(), 0.0f))); // other possibility is to count zeros...
 }
 
 void TopKQueue::findTopK(const QueryVector& qv, size_t startCol, size_t endCol, size_t level) {
@@ -33,7 +33,7 @@ void TopKQueue::findTopK(const QueryVector& qv, size_t startCol, size_t endCol, 
     }
 }
 
-TopKQueue::TopKQueue() :_tempIdVectorspace(), _tempIdValues(), _vectorSpace(), _columnIdLookup()
+TopKQueue::TopKQueue() :_tempIdVectorspace(), _idVecSums(), _vectorSpace(), _columnIdLookup()
 {
 }
 
@@ -53,17 +53,16 @@ void TopKQueue::buildIndex(size_t compressionBlockRows, size_t compressionBlockC
 {
     _compressionBlockCols = compressionBlockCols;
 
-	if (_tempIdValues.size()){
+	if (_tempIdVectorspace.size()){
 		if (sortVectorspace) {
 			// sort vector space for performance gain
-			std::sort(_tempIdValues.begin(), _tempIdValues.end(), IntFloatComparison());
+			std::sort(_idVecSums.begin(), _idVecSums.end(), IntFloatComparison());
 		}
-		for (auto idVal : _tempIdValues) {
+		for (auto idVal : _idVecSums) {
 			_columnIdLookup.push_back(idVal.first);
 			_vectorSpace.addColumn(_tempIdVectorspace[idVal.first]);
 			_tempIdVectorspace.erase(idVal.first);
 		}
-		_tempIdValues.clear();
 		_tempIdVectorspace.clear();
 	}
     _vectorSpace.buildPyramide(compressionBlockRows,compressionBlockCols,compressionLevels);

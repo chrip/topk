@@ -39,7 +39,7 @@ protected:
     size_t _compressionBlockRows;
 
 	std::unordered_map<int, const vec> _tempIdVectorspace;
-	std::vector<intFloat> _tempIdValues;
+	std::vector<intFloat> _idVecSums;
 
 	Vectorspace _vectorSpace;
     intFloatQueue _topKQueue;

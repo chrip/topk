@@ -43,20 +43,17 @@ void TopKQueueNRD::buildIndex(size_t compressionBlockRows, size_t compressionBlo
 {
 	TopKQueue::buildIndex(compressionBlockRows, compressionBlockCols, compressionLevels, sortVectorspace);
     this->clearIndex();
+
+	for (auto idVal : _idVecSums) {
+		float logSumLevel0 = log(idVal.second);
+		// at level 0 min == max
+		_minVectorLogSumPyramide[0].push_back(logSumLevel0);
+	}
     for(size_t level = 1; level <= compressionLevels; level++){
         this->sumMinMaxAtLevel(level-1);
     }
-    _logTotalNumberOfDocs = log(_vectorSpace.getVectorSpacePyramide()[0][0].size());
+    _logTotalNumberOfDocs = static_cast<float>(log(_vectorSpace.getVectorSpacePyramide()[0][0].size()));
 }
-
-void TopKQueueNRD::addVector(const int id, const vec &col)
-{
-    TopKQueue::addVector(id, col);
-    float logSumLevel0 = log(std::accumulate(col.begin(), col.end(), 0.0f));
-    // at level 0 min == max
-    _minVectorLogSumPyramide[0].push_back(logSumLevel0);
-}
-
 
 void TopKQueueNRD::findTopK(const QueryVector& qv, size_t startCol, size_t endCol, size_t level) {
 

@@ -7,8 +7,6 @@ class TopKQueueNRD : public TopKQueue
 {
 public:
     TopKQueueNRD();
-
-    void addVector(const int id, const vec &col);
 	void buildIndex(size_t compressionBlockRows, size_t compressionBlockCols, size_t compressionLevels, bool sortVectorspace = true) override;
 
     float normalizedRelevanceDistance(const QueryVector& qv, float queryLogSum, size_t c, size_t level);
