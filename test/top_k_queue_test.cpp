@@ -3,7 +3,7 @@
 #include "top_k_queue.h"
 
 #include "gtest/gtest.h"
-
+#include <random>
 
 TEST(tkqTest, topk) {
 
@@ -24,7 +24,9 @@ TEST(tkqTest, topk) {
     topKQueue.addVector(44,col2);
     vec col3 = vec {1,0,1,0};
     topKQueue.addVector(45,col3);
-    topKQueue.buildIndex(compressionBlockRows, compressionBlockCols, compressionLevels);
+
+	// set sortVectorspace to false because we access certain columns of the vectorspace
+    topKQueue.buildIndex(compressionBlockRows, compressionBlockCols, compressionLevels, false);
 
     // col 0 at level 0
     // 1*1 + 2*1 + 3*1 + 4*1 = 1 + 2 + 3 + 4 = 10
@@ -74,9 +76,11 @@ TEST(tkqTest, big_topk) {
 
     vec query = vec();
 
-    srand(42);
+	std::mt19937 engine(0); // Fixed seed of 0
+	std::uniform_real_distribution<> dist;
+
     for(size_t j = 0; j < vectorSpaceRows; j++){
-        query.push_back(static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
+		query.push_back(static_cast<float>(dist(engine)));
     }
 
     QueryVector qv = QueryVector(query, compressionBlockRows , compressionLevels);
@@ -84,7 +88,7 @@ TEST(tkqTest, big_topk) {
     for(size_t i = 0; i < vectorSpaceCols; i++){
         vec col = vec();
         for(size_t j = 0; j < vectorSpaceRows; j++){
-            col.push_back(static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
+			col.push_back(static_cast<float>(dist(engine)));
         }
         topKQueue.addVector(i,col);
     }

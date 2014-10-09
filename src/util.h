@@ -1,7 +1,7 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#include <sys/time.h>
+#include <chrono>
 #include <sstream>
 
 class util {
@@ -26,11 +26,11 @@ static int getJsonInt(const std::string& line, const std::string& key)
     return std::stoi(line.substr(begin, end-begin));
 }
 
-static double getTimestampInMilliseconds()
+static int64_t getTimestampInMilliseconds()
 {
-    struct timeval now;
-    gettimeofday (&now, NULL);
-    return now.tv_usec/1000.0 + (unsigned long long)now.tv_sec * 1000;
+	return std::chrono::duration_cast< std::chrono::milliseconds >(
+		   std::chrono::high_resolution_clock::now().time_since_epoch()
+		).count();
 }
 
 };

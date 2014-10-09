@@ -132,16 +132,20 @@ TEST(vsTest, pyramideRebuildTest) {
 
     vs.buildPyramide(compressionBlockRows, compressionBlockCols, compressionLevels);
     ASSERT_EQ(1, vs.getVectorSpacePyramide()[0][0][0]);
+
     ASSERT_EQ(2, vs.getVectorSpacePyramide()[1][0][0]);
     ASSERT_EQ(1, vs.getVectorSpacePyramide()[1][0][1]);
     ASSERT_EQ(1, vs.getVectorSpacePyramide()[1][0][2]);
+
+	ASSERT_EQ(3, vs.getVectorSpacePyramide()[1][0].size());
 
     // compress vector space with other parameters
     vs.buildPyramide(compressionBlockRows+1, compressionBlockCols+1, compressionLevels+1);
     ASSERT_EQ(1, vs.getVectorSpacePyramide()[0][0][0]);
     ASSERT_EQ(2, vs.getVectorSpacePyramide()[1][0][0]);
     ASSERT_EQ(1, vs.getVectorSpacePyramide()[1][0][1]);
-    ASSERT_EQ(1, vs.getVectorSpacePyramide()[1][0][2]);
+
+	ASSERT_EQ(2, vs.getVectorSpacePyramide()[1][0].size());
 
 }
 

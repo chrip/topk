@@ -12,10 +12,9 @@ void TopKQueue::executeTopK(const QueryVector& qv, size_t topK) {
     this->findTopK(qv, 0, _vectorSpace.getHighestCompressionCols(), _vectorSpace.getCompressionLevels());
 }
 
-void TopKQueue::addVector(const int id, const vec& v)
-{
-    _columnIdLookup.push_back(id);
-    _vectorSpace.addColumn(v);
+void TopKQueue::addVector(const int id, const vec& v) {
+	_tempIdVectorspace.insert({ id, v });
+	_tempIdValues.push_back(std::make_pair(id, std::accumulate(v.begin(), v.end(), 0.0f))); // other possibility is to count zeros...
 }
 
 void TopKQueue::findTopK(const QueryVector& qv, size_t startCol, size_t endCol, size_t level) {
@@ -34,7 +33,7 @@ void TopKQueue::findTopK(const QueryVector& qv, size_t startCol, size_t endCol, 
     }
 }
 
-TopKQueue::TopKQueue():_vectorSpace(),_columnIdLookup()
+TopKQueue::TopKQueue() :_tempIdVectorspace(), _tempIdValues(), _vectorSpace(), _columnIdLookup()
 {
 }
 
@@ -50,8 +49,22 @@ std::string TopKQueue::toString() {
     return "[" + result.substr(0,result.size()-1) + "]";
 }
 
-void TopKQueue::buildIndex(size_t compressionBlockRows, size_t compressionBlockCols, size_t compressionLevels)
+void TopKQueue::buildIndex(size_t compressionBlockRows, size_t compressionBlockCols, size_t compressionLevels, bool sortVectorspace)
 {
     _compressionBlockCols = compressionBlockCols;
+
+	if (_tempIdValues.size()){
+		if (sortVectorspace) {
+			// sort vector space for performance gain
+			std::sort(_tempIdValues.begin(), _tempIdValues.end(), IntFloatComparison());
+		}
+		for (auto idVal : _tempIdValues) {
+			_columnIdLookup.push_back(idVal.first);
+			_vectorSpace.addColumn(_tempIdVectorspace[idVal.first]);
+			_tempIdVectorspace.erase(idVal.first);
+		}
+		_tempIdValues.clear();
+		_tempIdVectorspace.clear();
+	}
     _vectorSpace.buildPyramide(compressionBlockRows,compressionBlockCols,compressionLevels);
 }

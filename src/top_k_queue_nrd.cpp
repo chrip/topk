@@ -39,9 +39,9 @@ void TopKQueueNRD::findTopNRD(const QueryVector& qv, size_t startCol, size_t end
     }
 }
 
-void TopKQueueNRD::buildIndex(size_t compressionBlockRows, size_t compressionBlockCols, size_t compressionLevels)
+void TopKQueueNRD::buildIndex(size_t compressionBlockRows, size_t compressionBlockCols, size_t compressionLevels, bool sortVectorspace)
 {
-    TopKQueue::buildIndex(compressionBlockRows, compressionBlockCols, compressionLevels);
+	TopKQueue::buildIndex(compressionBlockRows, compressionBlockCols, compressionLevels, sortVectorspace);
     this->clearIndex();
     for(size_t level = 1; level <= compressionLevels; level++){
         this->sumMinMaxAtLevel(level-1);

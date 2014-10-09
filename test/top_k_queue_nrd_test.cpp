@@ -21,6 +21,7 @@ TEST(tkqNrdTest, tryOutParameters) {
         tkqNRD.addVector(util::getJsonInt(line, "id"),vector);
     }
 
+	tkqNRD.buildIndex(1, 1, 0);
     std::cout << tkqNRD.getVectorSpaceSize() << " vectors of length " << tkqNRD.getVectorSpace().getVectorSpacePyramide()[0][0].size() << std::endl;
 
     std::ifstream input1( "test_data/query_vector.json" );
@@ -36,7 +37,7 @@ TEST(tkqNrdTest, tryOutParameters) {
                 size_t compressionBlockCols = 1;
                 for(;compressionBlockCols < 3; compressionBlockCols++){
 
-                    double start, end;
+					int64_t start, end;
                     tkqNRD.buildIndex(compressionBlockRows, compressionBlockCols, compressionLevels);
 
                     start = util::getTimestampInMilliseconds();

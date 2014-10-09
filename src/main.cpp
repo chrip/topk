@@ -6,7 +6,7 @@ int main(int argc, const char * argv[])
 		std::cout << "usage: pathToVectorSpaceData port" << std::endl;
 		std::cout << "for example: ./topk_server /data/index.json 8081";
 	}
-	Server server(argv[1], atoi(argv[2]));
+	Server server(argv[1], static_cast<uint16_t>(atoi(argv[2])));
 	server.communicate();
 
 	return 0;
