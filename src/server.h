@@ -32,9 +32,9 @@ private:
 	int _newSockFd;
 #endif
     TopKQueueNRD _topKQueueNRD;
-    size_t _compressionBlockRows = 3;
-    size_t _compressionBlockCols = 1;
-    size_t _compressionLevels = 2;
+    size_t _compressionBlockRows;
+    size_t _compressionBlockCols;
+    size_t _compressionLevels;
 };
 
 #endif // SERVER_H

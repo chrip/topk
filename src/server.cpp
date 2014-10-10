@@ -14,7 +14,10 @@
 Server::Server(const std::string &pathToVectorSpaceData, uint16_t portNr) :
 	_sockFd(0),
 	_newSockFd(0),
-    _topKQueueNRD()
+    _topKQueueNRD(),
+	_compressionBlockRows(3),
+    _compressionBlockCols(1),
+    _compressionLevels(2)
 {
     std::ifstream input0(pathToVectorSpaceData);
 	std::cout << "Using index file " << pathToVectorSpaceData << std::endl;
@@ -55,7 +58,7 @@ Server::Server(const std::string &pathToVectorSpaceData, uint16_t portNr) :
 }
 
 void Server::communicate() {
-    char buffer[BUFFER_SIZE];
+	char chunk[BUFFER_SIZE];
 	struct sockaddr_in cli_addr;
 #ifdef _WIN32
 	int clilen;
@@ -68,18 +71,22 @@ void Server::communicate() {
 		std::cout << "ERROR on accept" << std::endl;
 	}
     while(1) {
-		uint32_t n = 0; /* byte count or error */
-    	memset(buffer, 0, BUFFER_SIZE); // clear buffer
 		std::string resultJson = "";
-		while (n < BUFFER_SIZE) {
-		   n = read(_newSockFd, &buffer, BUFFER_SIZE-1);
-		   if (n < 0) {
-			   break;
-		   }
-		   resultJson += buffer;
-		   if (buffer[n - 2] == ']' &&  buffer[n - 1] == '}') {
-			   break;
-		   }
+		int totalSize = 0;
+		int n = 0;
+		while (1) {
+			memset(chunk, 0, BUFFER_SIZE); // clear buffer
+			int n = recv(_newSockFd, chunk, BUFFER_SIZE - 1, 0);
+			if (n < 0) {
+				break;
+			}
+			totalSize += n;
+			resultJson += chunk;
+			// check if end of msg
+			if (resultJson.substr(totalSize - 2) == "]}") {
+				// std::cout << "recv msg complete" << std::endl;
+				break;
+			}		   
 		}
 		if (n < 0) {
 			std::cout << "ERROR reading from socket" << std::endl;
@@ -89,7 +96,7 @@ void Server::communicate() {
 		int64_t startTs = util::getTimestampInMilliseconds();
 
         vec v = vec();
-		util::stringToVec(resultJson, v);
+		util::stringToVec(resultJson.substr(0, resultJson.size()-1), v);
 
         QueryVector qv = QueryVector(v, _compressionBlockRows, _compressionLevels);
 
@@ -98,8 +105,8 @@ void Server::communicate() {
         std::string resultArray = _topKQueueNRD.toString() + "\n"; // newline at the end because the corresponding side read the socket by ".readLine()"
 
 
-		n = write(_newSockFd, resultArray.c_str(), resultArray.size());
-		if (n < 0) {
+		n = send(_newSockFd, resultArray.c_str(), resultArray.size(), 0);
+		if (n != resultArray.size()) {
 			std::cout << "ERROR writing to socket" << std::endl;
 			break;
 		}

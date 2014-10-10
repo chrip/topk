@@ -29,7 +29,7 @@ void tryOutParameters(bool sortVectorspace){
 		util::stringToVec(line, vector);
 
 		size_t compressionLevels = 0;
-		for (; compressionLevels < 10; compressionLevels++){
+		for (; compressionLevels < 4; compressionLevels++){
 			size_t compressionBlockRows = 1;
 			for (; compressionBlockRows < 10; compressionBlockRows++){
 				size_t compressionBlockCols = 1;
@@ -59,13 +59,13 @@ void tryOutParameters(bool sortVectorspace){
 	}
 }
 
-TEST(tkqNrdTest, tryOutParametersUnsortedVectorspace) {
-	bool sortVectorspace = false;
+TEST(tkqNrdTest, tryOutParametersSortedVectorspace) {
+	bool sortVectorspace = true;
 	tryOutParameters(sortVectorspace);
 }
 
-TEST(tkqNrdTest, tryOutParametersSortedVectorspace) {
-	bool sortVectorspace = true;
+TEST(tkqNrdTest, tryOutParametersUnsortedVectorspace) {
+	bool sortVectorspace = false;
 	tryOutParameters(sortVectorspace);
 }
 
