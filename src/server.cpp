@@ -83,13 +83,13 @@ void Server::communicate() {
 			totalSize += n;
 			resultJson += chunk;
 			// check if end of msg
-			if (resultJson.substr(totalSize - 2) == "]}") {
+			if (totalSize < 2 || resultJson.substr(totalSize - 2) == "]}") {
 				// std::cout << "recv msg complete" << std::endl;
 				break;
 			}		   
 		}
-		if (n < 0) {
-			std::cout << "ERROR reading from socket" << std::endl;
+		if (n < 0 || resultJson == "") {
+			std::cout << "The other side closed the socket, exit" << std::endl;
 			break;
 		}
 
@@ -106,7 +106,7 @@ void Server::communicate() {
 
 
 		n = send(_newSockFd, resultArray.c_str(), resultArray.size(), 0);
-		if (n != resultArray.size()) {
+		if (n != static_cast<int>(resultArray.size())) {
 			std::cout << "ERROR writing to socket" << std::endl;
 			break;
 		}
