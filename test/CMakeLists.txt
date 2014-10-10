@@ -6,6 +6,7 @@ include_directories(../src)
 
 configure_file(test_data/vector_space.json ${CMAKE_CURRENT_BINARY_DIR}/test_data/vector_space.json COPYONLY)
 configure_file(test_data/query_vector.json ${CMAKE_CURRENT_BINARY_DIR}/test_data/query_vector.json COPYONLY)
+configure_file(test_data/more_query_vectors.json ${CMAKE_CURRENT_BINARY_DIR}/test_data/more_query_vectors.json COPYONLY)
 
 add_executable( vector_space_test vector_space_test.cpp)
 target_link_libraries(vector_space_test ${PROJECT_NAME} gtest gtest_main)
