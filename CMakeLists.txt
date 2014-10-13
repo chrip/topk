@@ -8,6 +8,7 @@ add_definitions(-std=c++11)
 else()
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -W4")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -W4")
+add_compile_options(/FS)
 endif()
 
 set(CMAKE_BUILD_TYPE "Debug")

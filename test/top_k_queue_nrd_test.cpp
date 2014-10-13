@@ -21,7 +21,7 @@ void tryOutParameters(bool sortVectorspace){
 	size_t topK = 3;
 	TopKQueueNRD tkqNRD = TopKQueueNRD();
 
-	//   loadVectorSpace(tkqNRD, "/home/chrisschaefer/workspace/topk/job.json"); 
+	 //  loadVectorSpace(tkqNRD, "/home/chrisschaefer/workspace/topk/job.json"); 
 	loadVectorSpace(tkqNRD, "test_data/vector_space.json");
 
 	tkqNRD.buildIndex(1, 1, 0, sortVectorspace);
@@ -74,7 +74,7 @@ TEST(tkqNrdTest, tryOutParametersSortedVectorspace) {
 	tryOutParameters(sortVectorspace);
 }
 
-typedef std::pair<std::string, int> stringInt;
+typedef std::pair<std::string, int64_t> stringInt;
 
 class StringIntComparison
 {
@@ -91,8 +91,8 @@ void findBestParameter(bool sortVectorspace){
 	size_t topK = 20;
 	TopKQueueNRD tkqNRD = TopKQueueNRD();
 
-	 //  loadVectorSpace(tkqNRD, "../../job.json"); 
-	loadVectorSpace(tkqNRD, "test_data/vector_space.json");
+	//   loadVectorSpace(tkqNRD, "../../job.json"); 
+	   loadVectorSpace(tkqNRD, "test_data/vector_space.json");
 
 	tkqNRD.buildIndex(1, 1, 0, sortVectorspace);
 	std::cout << tkqNRD.getVectorSpaceSize() << " vectors of length " << tkqNRD.getVectorSpace().getVectorSpacePyramide()[0][0].size() << std::endl;
@@ -102,12 +102,12 @@ void findBestParameter(bool sortVectorspace){
 		topKQueue.push({ "", 10000000 });
 	}
 
-	size_t compressionLevels = 1;
+	size_t compressionLevels = 0;
 	for (; compressionLevels < 2; compressionLevels++){
-		size_t compressionBlockRows = 2;
-		for (; compressionBlockRows < 4; compressionBlockRows++){
-			size_t compressionBlockCols = 2;
-			for (; compressionBlockCols < 4; compressionBlockCols++){
+		size_t compressionBlockRows = 1;
+		for (; compressionBlockRows < 5; compressionBlockRows++){
+			size_t compressionBlockCols = 1;
+			for (; compressionBlockCols < 5; compressionBlockCols++){
 
 				int64_t avgTime = 0;
 				int64_t counter = 0;

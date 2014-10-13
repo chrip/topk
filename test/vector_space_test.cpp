@@ -37,7 +37,7 @@ TEST(vsTest, pyramideSizeTest) {
     for(size_t i = 0; i < vectorSpaceCols; i++){
         vec col = vec();
         for(size_t j = 0; j < vectorSpaceRows; j++){
-            col.push_back(j);
+            col.push_back(static_cast<float>(j));
         }
         vs.addColumn(col);
     }
