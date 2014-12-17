@@ -40,10 +40,12 @@ TopKQueue::TopKQueue() :_tempIdVectorspace(), _idVecSums(), _vectorSpace(), _col
 std::string TopKQueue::toString() {
     std::string result;
     while (!_topKQueue.empty()) {
-        std::ostringstream item;
-        item << "[" << std::to_string(_columnIdLookup[_topKQueue.top().first])
-             << ","<< std::fixed << std::setprecision(4) << _topKQueue.top().second << "],";
-        result = item.str() + result;
+	if(_topKQueue.top().second != 0.0){
+		std::ostringstream item;
+		item << "[" << std::to_string(_columnIdLookup[_topKQueue.top().first])
+		     << ","<< std::fixed << std::setprecision(4) << _topKQueue.top().second << "],";
+		result = item.str() + result;
+	}
         _topKQueue.pop();
     }
     return "[" + result.substr(0,result.size()-1) + "]";
